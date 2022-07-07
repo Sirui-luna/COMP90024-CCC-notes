@@ -1,4 +1,4 @@
-##Docker container
+## Docker container
 
 **Commonly used docker commands**
 
@@ -36,24 +36,35 @@ docker ps -a
 ```
 **Stop / Restart / Remove a Docker Container**
 
-• Restart a container> Syntax: docker restart [OPTIONS] CONTAINER [CONTAINER …]
+• Restart a container
+> Syntax: docker restart [OPTIONS] CONTAINER [CONTAINER …]
 
-```docker restart mydocker
-
-```• Stop the container> Syntax: docker stop [OPTIONS] CONTAINER [CONTAINER …]
-
-```docker stop mydocker
 ```
-• Remove a non-running container> Syntax: docker rm [OPTIONS] CONTAINER [CONTAINER …]
+docker restart mydocker
 
-```docker rm mydocker
-```• Remove a running container
+```
+• Stop the container
+> Syntax: docker stop [OPTIONS] CONTAINER [CONTAINER …]
 
-```docker rm -f mydocker
+```
+docker stop mydocker
+```
+
+• Remove a non-running container
+> Syntax: docker rm [OPTIONS] CONTAINER [CONTAINER …]
+
+```
+docker rm mydocker
+```
+• Remove a running container
+
+```
+docker rm -f mydocker
 ```
 **Run a shell within a container**
 
-Containers can be started and stopped, and behave like VMs.Instead of using SSH to access a VM, a container can be accessed with exec command.
+Containers can be started and stopped, and behave like VMs.
+Instead of using SSH to access a VM, a container can be accessed with exec command.
 
 (Not recommended, mainly for debug or testing purpose.)
 
@@ -64,55 +75,77 @@ Containers can be started and stopped, and behave like VMs.Instead of using SSH
 > /usr/share/nginx/html/ : html root of nginx
 > 
 
-```docker exec -ti -w /usr/share/nginx/html/ mydocker sh
+```
+docker exec -ti -w /usr/share/nginx/html/ mydocker sh
 ```
 
 **Create Volume in Docker**
 
-• Create a volume> Syntax: docker volume create [OPTIONS] [VOLUME]
+• Create a volume
+> Syntax: docker volume create [OPTIONS] [VOLUME]
 
-```docker volume create --name htdocs
-```• *Volume mount* : Start a container with a volume attached
+```
+docker volume create --name htdocs
+```
+• *Volume mount* : Start a container with a volume attached
 > -v : mount the volume htdocs volume to the container's root html file
 
-```docker run --name nginx-volume -p 8080:80 \-v htdocs:/usr/share/nginx/html -d nginx
-```• *Bind mount* : Start a container with bind mount attached
+```
+docker run --name nginx-volume -p 8080:80 \
+-v htdocs:/usr/share/nginx/html -d nginx
+```
+• *Bind mount* : Start a container with bind mount attached
 (more flexible, you can change file outsidee the container and it will update in the container)
 > pwd : enter the path of your working directory, e.g. the path of demo1 folder in docker workshop
 
-```docker run --name nginx-bind -p 8081:80 \-v $(pwd)/htdocs:/usr/share/nginx/html -d nginx
+```
+docker run --name nginx-bind -p 8081:80 \
+-v $(pwd)/htdocs:/usr/share/nginx/html -d nginx
 ```
 **Create image**
 
-• Create an image> * Syntax: docker build [OPTIONS] PATH
+• Create an image
+> * Syntax: docker build [OPTIONS] PATH
 > * "demo2 . ": with the " ." the docker will look at the all the file in current directory and interact them based on the dockerfile
 > * Do not need to specify the dockerfile, it will look at a file called "dockerfile" in the current directory by default. However if it is not named as "dockerfile" you can add `-f` to specify the file path
 
-```docker build -t demo2 .
 ```
-• Create a container from the image
+docker build -t demo2 .
+```
+
+• Create a container from the image
 > -e: environmental variable
 
-```docker run --name demo2 -e WELCOME_STRING="COMP90024" \-p 8081:80 -d demo2
 ```
-##Docker Compose
+docker run --name demo2 -e WELCOME_STRING="COMP90024" \
+-p 8081:80 -d demo2
+```
+## Docker Compose
 
-• Start the containers> Syntax: docker-compose up [OPTIONS]
+• Start the containers
+> Syntax: docker-compose up [OPTIONS]
 
-```docker-compose up -d
+```
+docker-compose up -d
 ```
 If the file name isn't "docker-compose", then do:
 
 ```
 docker-compose -f <path of yoour composed file> up -d
 ```
-• Stop the containers> Syntax: docker-compose stop [OPTIONS] [SERVICE …]
 
-```docker-compose stop
-```• Remove the containers> Syntax: docker-compose down [OPTIONS]
+• Stop the containers
+> Syntax: docker-compose stop [OPTIONS] [SERVICE …]
+
+```
+docker-compose stop
+```
+• Remove the containers
+> Syntax: docker-compose down [OPTIONS]
 > However, this will not remove the volume of the docker
 
-```docker-compose down
+```
+docker-compose down
 ```
 to remove the volume of the compose
 
@@ -173,7 +206,7 @@ docker run -p 8081:80 -d --restart always phpmyadmin/phpmyadmin
 ```
 
 
-##Docker SWARM
+## Docker SWARM
 
 To use docker SWARM, we need to have docker machine creates several nodes on the local compuuter
 
@@ -182,7 +215,9 @@ _**Docker Machine**_
 create one manager and two workers
 
 ```
-docker-machine create managerdocker-machine create worker1docker-machine create worker2
+docker-machine create manager
+docker-machine create worker1
+docker-machine create worker2
 ```
 List all the running nodes
 
@@ -212,7 +247,9 @@ docker-machine ssh manager docker swarm join-token manager
 * Join a Docker SWARM via join tocken
 
 ```
-docker-machine ssh worker1 docker swarm join --tokenSWMTKN-1-2uj8tpltiekyk1e5n4dcugcokjo8a2cfuvgby9s8ru8jwgg6q2-f3xw8888sfw0ayvgrcuv4efam 192.168.99.100:2377
+docker-machine ssh worker1 docker swarm join --token
+SWMTKN-1-2uj8tpltiekyk1e5n4dcugcokjo8a2cfuvgby9s8ru8jwgg6q2-
+f3xw8888sfw0ayvgrcuv4efam 192.168.99.100:2377
 ```
 * List all nodes IN the SWARM
 
@@ -221,29 +258,47 @@ docker-machine ssh manager docker node ls
 ```
 **Create a service**
 
-• Create a service> Syntax: docker service create [OPTIONS] IMAGE [COMMAND]
-> -- replicas 3 : create three instances (3 containers, one for each node)```docker-machine ssh manager docker service create --replicas3 -p 8083:80 --name myswarm nginx:alpine
+• Create a service
+> Syntax: docker service create [OPTIONS] IMAGE [COMMAND]
+> -- replicas 3 : create three instances (3 containers, one for each node)
+
 ```
-• List a service> Syntax: docker service ls [OPTIONS]
+docker-machine ssh manager docker service create --replicas
+3 -p 8083:80 --name myswarm nginx:alpine
+```
 
-```docker-machine ssh manager docker service ls
-```• Check a service> Syntax: docker service ps [OPTIONS] SERVICE [SERVICE …]
+• List a service
+> Syntax: docker service ls [OPTIONS]
 
-```docker-machine ssh manager docker service ps myswarm
+```
+docker-machine ssh manager docker service ls
+```
+• Check a service
+> Syntax: docker service ps [OPTIONS] SERVICE [SERVICE …]
+
+```
+docker-machine ssh manager docker service ps myswarm
 ```
 
 **Scaling and Rolling Update**
 
-• Scale up / down (but it will limited to the number of host machines)> Syntax: docker service scale SERVICE=REPLICAS
+• Scale up / down (but it will limited to the number of host machines)
+> Syntax: docker service scale SERVICE=REPLICAS
 > The scalling is manual and not auto for Docker SWARM, but other orchestration tool may can do
 
-```docker-machine ssh manager docker service scale nginx=6docker-machine ssh manager docker service scale nginx=2
 ```
-• Rolling update> * Syntax: docker service update [OPTIONS] SERVICE
+docker-machine ssh manager docker service scale nginx=6
+docker-machine ssh manager docker service scale nginx=2
+```
+
+• Rolling update
+> * Syntax: docker service update [OPTIONS] SERVICE
 > * Update all the containers in the cluster's image to "alwynpan/comp90024:demo1" by sequences -- allows no downtime update (although users will sees different version while it updating)
 
 
-```docker-machine ssh manager docker service update --imagealwynpan/comp90024:demo1 nginx
+```
+docker-machine ssh manager docker service update --image
+alwynpan/comp90024:demo1 nginx
 ```
 
 
